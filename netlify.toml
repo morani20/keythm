@@ -1,0 +1,25 @@
+# Netlify build configuration.
+# The official Next.js runtime is auto-installed by Netlify; no plugin entry needed.
+[build]
+  command = "npm run build"
+
+[build.environment]
+  NODE_VERSION = "22"
+  NEXT_TELEMETRY_DISABLED = "1"
+
+# Long-lived caching for the heavy static audio sprite (1.9 MB)
+[[headers]]
+  for = "/sounds/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/languages/*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+
+# The service worker must always be revalidated or users get stuck on old builds
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"

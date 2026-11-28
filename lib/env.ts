@@ -1,0 +1,29 @@
+import { createEnv } from "@t3-oss/env-nextjs";
+import { z } from "zod";
+
+const LIBSQL_REGEX = /^libsql:\/\//;
+
+export const env = createEnv({
+  shared: {
+    NODE_ENV: z
+      .enum(["development", "production", "test"])
+      .default("development"),
+  },
+  server: {
+    // The visit counter is an optional feature. Without these two variables
+    // the site must still build and run (the counter is simply hidden).
+    // Previously they were required, which made `next build` crash on any
+    // host (e.g. Netlify) where they were not configured.
+    DATABASE_URL: z
+      .string()
+      .url()
+      .regex(LIBSQL_REGEX, "Must be a valid libsql URL")
+      .optional(),
+    DATABASE_AUTH_TOKEN: z.string().min(20).optional(),
+  },
+  client: {},
+  experimental__runtimeEnv: {
+    NODE_ENV: process.env.NODE_ENV,
+  },
+  emptyStringAsUndefined: true,
+});
